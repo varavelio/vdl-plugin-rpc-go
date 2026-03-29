@@ -203,7 +203,7 @@ export function renderPathCatalog(services: ServiceDescriptor[]): string {
 export function renderCoreRuntime(): string {
   return dedent(/* go */ `
     // -----------------------------------------------------------------------------
-    // Core Types
+    // RPC Core Types
     // -----------------------------------------------------------------------------
 
     // OperationType identifies the transport behavior of an RPC operation and can
@@ -303,7 +303,6 @@ export function renderCoreRuntime(): string {
       //   1. Message can be directly shown to the user to inform them of the issue.
       //   2. Developers can use Message in logs to diagnose problems during development or in production.
       Message string \`json:"message"\`
-
       // Category categorizes the error by its nature or source.
       //
       // Examples:
@@ -317,7 +316,6 @@ export function renderCoreRuntime(): string {
       //   2. Clients can inspect the Category to decide whether to prompt the user for action,
       //      such as re-authentication if the Category is "AuthenticationError".
       Category string \`json:"category,omitzero"\`
-
       // Code is a machine-readable identifier for the specific error condition.
       //
       // Examples:
@@ -331,7 +329,6 @@ export function renderCoreRuntime(): string {
       //   2. Clients or middleware can implement specific logic based on the Code,
       //      such as retry mechanisms for "TEMPORARY_FAILURE" or showing captcha for "RATE_LIMIT_EXCEEDED".
       Code string \`json:"code,omitzero"\`
-
       // Details contains optional additional information about the error.
       //
       // This field can include any relevant data that provides more context about the error.
