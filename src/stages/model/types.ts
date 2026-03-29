@@ -35,14 +35,14 @@ export type OperationDescriptor = {
   name: string;
   goName: string;
   operationTypeName: string;
-  inputTypeName: string;
-  outputTypeName: string;
+  inputTypeName?: string;
+  outputTypeName?: string;
   position: Position;
   doc?: string;
   deprecated?: string;
   annotations: Annotation[];
-  inputField: Field;
-  outputField: Field;
+  inputField?: Field;
+  outputField?: Field;
 };
 
 /**
