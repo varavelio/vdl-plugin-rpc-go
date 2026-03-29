@@ -141,23 +141,7 @@ function buildOperationDescriptor(
   const inputField = findOperationField(field, "input");
   const outputField = findOperationField(field, "output");
 
-  if (!inputField) {
-    errors.push({
-      message: `Operation ${JSON.stringify(serviceType.name)}.${JSON.stringify(field.name)} must declare an input field.`,
-      position: fallbackPosition(field.position, serviceType.position),
-    });
-    return undefined;
-  }
-
-  if (!outputField) {
-    errors.push({
-      message: `Operation ${JSON.stringify(serviceType.name)}.${JSON.stringify(field.name)} must declare an output field.`,
-      position: fallbackPosition(field.position, serviceType.position),
-    });
-    return undefined;
-  }
-
-  if (inputField.typeRef.kind !== "object") {
+  if (inputField && inputField.typeRef.kind !== "object") {
     errors.push({
       message: `Operation ${JSON.stringify(serviceType.name)}.${JSON.stringify(field.name)} input must be an object type.`,
       position: fallbackPosition(inputField.position, field.position),
@@ -165,7 +149,7 @@ function buildOperationDescriptor(
     return undefined;
   }
 
-  if (outputField.typeRef.kind !== "object") {
+  if (outputField && outputField.typeRef.kind !== "object") {
     errors.push({
       message: `Operation ${JSON.stringify(serviceType.name)}.${JSON.stringify(field.name)} output must be an object type.`,
       position: fallbackPosition(outputField.position, field.position),
@@ -184,8 +168,12 @@ function buildOperationDescriptor(
     name: field.name,
     goName,
     operationTypeName,
-    inputTypeName: toInlineTypeName(operationTypeName, inputField.name),
-    outputTypeName: toInlineTypeName(operationTypeName, outputField.name),
+    inputTypeName: inputField
+      ? toInlineTypeName(operationTypeName, inputField.name)
+      : undefined,
+    outputTypeName: outputField
+      ? toInlineTypeName(operationTypeName, outputField.name)
+      : undefined,
     position: field.position,
     doc: field.doc,
     deprecated: getDeprecatedMessage(field.annotations),

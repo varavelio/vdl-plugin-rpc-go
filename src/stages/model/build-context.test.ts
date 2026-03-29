@@ -124,4 +124,40 @@ describe("createGeneratorContext", () => {
       'Operation "Broken"."oops" input must be an object type.',
     ]);
   });
+
+  it("allows operations that omit input and output entirely", () => {
+    const input = pluginInput({
+      ir: schema({
+        types: [
+          typeDef(
+            "Commands",
+            objectType([
+              field("ping", objectType([]), {
+                annotations: [annotation("proc")],
+              }),
+            ]),
+            {
+              annotations: [annotation("rpc")],
+            },
+          ),
+        ],
+      }),
+    });
+
+    const result = createGeneratorContext({
+      input,
+      generatorOptions: {
+        packageName: "client",
+        target: "client",
+        typesImport: "fixture/internal/types",
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(result.context?.procedures[0]).toMatchObject({
+      name: "ping",
+      inputTypeName: undefined,
+      outputTypeName: undefined,
+    });
+  });
 });
