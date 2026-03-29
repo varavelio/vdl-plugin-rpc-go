@@ -3,7 +3,7 @@ import type {
   LiteralValue,
   PluginOutputFile,
 } from "@varavel/vdl-plugin-sdk";
-import { dedent } from "@varavel/vdl-plugin-sdk/utils/strings";
+import { dedent, limitBlankLines } from "@varavel/vdl-plugin-sdk/utils/strings";
 import type { OperationDescriptor, ServiceDescriptor } from "../model/types";
 
 /**
@@ -88,9 +88,13 @@ export function createGoFile(
   header: string,
   body: string,
 ): PluginOutputFile {
+  let content = "";
+  content = joinSections([header, body]);
+  content = limitBlankLines(content, 1);
+
   return {
     path,
-    content: joinSections([header, body]),
+    content,
   };
 }
 
