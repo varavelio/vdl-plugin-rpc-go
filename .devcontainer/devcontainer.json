@@ -17,7 +17,8 @@
         "dprint.dprint",
         "biomejs.biome",
         "vitest.explorer",
-        "golang.go"
+        "golang.go",
+        "bierner.comment-tagged-templates"
       ],
       "settings": {
         "editor.formatOnSave": true,
