@@ -214,9 +214,9 @@ export const SERVER_RUNTIME = dedent(/* go */ `
     // handlersMu protects all handler maps and middleware slices from concurrent access
     handlersMu sync.RWMutex
 
-    // operationDefs contains the definition of all registered operations
-    // Map format: rpcName -> operationName -> OperationType ("proc" or "stream")
-    operationDefs map[string]map[string]OperationType
+    // operationDefs contains the definition of all registered operations.
+    // Map format: rpcName -> operationName -> OperationDefinition.
+    operationDefs map[string]map[string]OperationDefinition
 
     // procHandlers stores the final implementation functions for procedures
     // Map format: rpcName -> procName -> handler
@@ -288,7 +288,7 @@ export const SERVER_RUNTIME = dedent(/* go */ `
   // Returns a new internalServer instance ready for handler and middleware registration.
   func newInternalServer[T any](procDefs []OperationDefinition, streamDefs []OperationDefinition) *internalServer[T] {
     // Initialize maps
-    operationDefs := make(map[string]map[string]OperationType)
+    operationDefs := make(map[string]map[string]OperationDefinition)
     procHandlers := make(map[string]map[string]ProcHandlerFunc[T, any, any])
     streamHandlers := make(map[string]map[string]StreamHandlerFunc[T, any, any])
     rpcMiddlewares := make(map[string][]GlobalMiddlewareFunc[T])
@@ -304,7 +304,7 @@ export const SERVER_RUNTIME = dedent(/* go */ `
     // Helper to ensure RPC map existence
     ensureRPC := func(rpcName string) {
       if _, ok := operationDefs[rpcName]; !ok {
-        operationDefs[rpcName] = make(map[string]OperationType)
+        operationDefs[rpcName] = make(map[string]OperationDefinition)
         procHandlers[rpcName] = make(map[string]ProcHandlerFunc[T, any, any])
         streamHandlers[rpcName] = make(map[string]StreamHandlerFunc[T, any, any])
         procMiddlewares[rpcName] = make(map[string][]ProcMiddlewareFunc[T, any, any])
@@ -318,11 +318,11 @@ export const SERVER_RUNTIME = dedent(/* go */ `
 
     for _, def := range procDefs {
       ensureRPC(def.RPCName)
-      operationDefs[def.RPCName][def.Name] = def.Type
+      operationDefs[def.RPCName][def.Name] = def
     }
     for _, def := range streamDefs {
       ensureRPC(def.RPCName)
-      operationDefs[def.RPCName][def.Name] = def.Type
+      operationDefs[def.RPCName][def.Name] = def
     }
 
     return &internalServer[T]{
@@ -544,7 +544,7 @@ export const SERVER_RUNTIME = dedent(/* go */ `
       return s.writeProcResponse(httpAdapter, res)
     }
 
-    operationType, operationExists := s.operationDefs[rpcName][operationName]
+    operation, operationExists := s.operationDefs[rpcName][operationName]
     if !operationExists {
       res := Response[any]{
         Ok:    false,
@@ -558,15 +558,17 @@ export const SERVER_RUNTIME = dedent(/* go */ `
       Input:   rawInput,
       Props:   props,
       Context: ctx,
+      Annotations: cloneAnnotations(operation.Annotations),
       operation: OperationDefinition{
-        RPCName: rpcName,
-        Name:    operationName,
-        Type:    operationType,
+        RPCName:     operation.RPCName,
+        Name:        operation.Name,
+        Type:        operation.Type,
+        Annotations: cloneAnnotations(operation.Annotations),
       },
     }
 
     // Handle Stream
-    if operationType == OperationTypeStream {
+    if operation.Type == OperationTypeStream {
       err := s.handleStreamRequest(c, rpcName, operationName, rawInput, httpAdapter)
 
       // If no error, return without sending any response
