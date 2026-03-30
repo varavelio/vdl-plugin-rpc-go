@@ -1,0 +1,26 @@
+@rpc
+type Jobs {
+  @proc
+  @retryable({ level "high" })
+  create {
+    input {
+      name string
+    }
+
+    output {
+      attempts int
+    }
+  }
+
+  @stream
+  @reconnectable({ channel "jobs" })
+  updates {
+    input {
+      workerId string
+    }
+
+    output {
+      seq int
+    }
+  }
+}
