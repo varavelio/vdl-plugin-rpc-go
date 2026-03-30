@@ -1,0 +1,33 @@
+@rpc
+type Users {
+  @proc
+  get {
+    input {}
+
+    output {
+      authorization string
+      trace string
+      requestId string
+    }
+  }
+}
+
+@rpc
+type Profile {
+  @proc
+  fail {
+    input {}
+
+    output {}
+  }
+}
+
+@rpc
+type Auth {
+  @proc
+  login {
+    input {}
+
+    output {}
+  }
+}
