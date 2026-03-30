@@ -1,0 +1,33 @@
+const config = {
+  version 1
+  plugins [
+    {
+      src "varavelio/vdl-plugin-go@v0.1.2"
+      schema "./schema.vdl"
+      outDir "./internal/types"
+      options {
+        package "types"
+      }
+    }
+    {
+      src "../../../dist/index.js"
+      schema "./schema.vdl"
+      outDir "./internal/client"
+      options {
+        package "client"
+        target "client"
+        typesImport "fixture/internal/types"
+      }
+    }
+    {
+      src "../../../dist/index.js"
+      schema "./schema.vdl"
+      outDir "./internal/server"
+      options {
+        package "server"
+        target "server"
+        typesImport "fixture/internal/types"
+      }
+    }
+  ]
+}

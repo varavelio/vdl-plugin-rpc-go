@@ -1,0 +1,8 @@
+@rpc
+type Commands {
+  @proc
+  ping {}
+
+  @stream
+  heartbeat {}
+}
