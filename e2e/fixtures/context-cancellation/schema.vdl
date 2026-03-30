@@ -1,0 +1,11 @@
+@rpc
+type Service {
+  @stream
+  counter {
+    input {}
+
+    output {
+      count int
+    }
+  }
+}
