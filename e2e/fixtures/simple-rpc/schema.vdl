@@ -1,0 +1,14 @@
+@rpc
+type Calculator {
+  @proc
+  add {
+    input {
+      a int
+      b int
+    }
+
+    output {
+      sum int
+    }
+  }
+}
