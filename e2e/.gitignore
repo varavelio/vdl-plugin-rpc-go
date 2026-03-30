@@ -1,2 +1,4 @@
 **/gen
 **/generated
+**/internal
+**/go.mod
