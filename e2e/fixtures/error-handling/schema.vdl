@@ -1,0 +1,17 @@
+@rpc
+type Auth {
+  @proc
+  login {
+    input {}
+    output {}
+  }
+}
+
+@rpc
+type Users {
+  @proc
+  get {
+    input {}
+    output {}
+  }
+}
