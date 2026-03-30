@@ -1,0 +1,11 @@
+@rpc
+type Service {
+  @proc
+  test {
+    input {}
+
+    output {
+      intercepted bool
+    }
+  }
+}
