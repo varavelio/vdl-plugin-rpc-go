@@ -1,0 +1,14 @@
+@rpc
+type Service {
+  @proc
+  echo {
+    input {
+      data string
+    }
+
+    output {
+      data string
+      receivedTraceId string
+    }
+  }
+}
