@@ -1,0 +1,32 @@
+@rpc
+type ServiceA {
+  @proc
+  proc1 {
+    input {}
+
+    output {
+      trace string[]
+    }
+  }
+
+  @proc
+  proc2 {
+    input {}
+
+    output {
+      trace string[]
+    }
+  }
+}
+
+@rpc
+type ServiceB {
+  @proc
+  proc1 {
+    input {}
+
+    output {
+      trace string[]
+    }
+  }
+}
