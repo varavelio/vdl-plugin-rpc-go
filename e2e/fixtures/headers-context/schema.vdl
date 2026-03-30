@@ -1,0 +1,11 @@
+@rpc
+type Service {
+  @proc
+  getHeaders {
+    input {}
+
+    output {
+      values map[string]
+    }
+  }
+}
