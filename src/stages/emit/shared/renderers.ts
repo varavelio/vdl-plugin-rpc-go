@@ -98,36 +98,6 @@ function renderObjectLiteral(
 }
 
 /**
- * Renders a Go documentation comment block.
- */
-export function renderDocComment(doc?: string): string {
-  if (!doc) {
-    return "";
-  }
-
-  return doc
-    .split("\n")
-    .map((line) => `// ${line}`)
-    .join("\n");
-}
-
-/**
- * Renders a Go deprecation comment from a VDL `@deprecated` annotation.
- */
-export function renderDeprecatedComment(message?: string): string {
-  if (message === undefined) {
-    return "";
-  }
-
-  const description =
-    message.length > 0
-      ? message
-      : "This symbol is deprecated and should not be used in new code.";
-
-  return `// Deprecated: ${description}`;
-}
-
-/**
  * Renders a complete Go comment block with a summary, optional VDL doc, and deprecation note.
  */
 export function renderCommentBlock(options: {
