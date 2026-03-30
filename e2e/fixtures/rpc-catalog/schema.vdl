@@ -1,0 +1,14 @@
+@rpc
+type MyService {
+  @proc
+  myProc {
+    input {}
+    output {}
+  }
+
+  @stream
+  myStream {
+    input {}
+    output {}
+  }
+}
