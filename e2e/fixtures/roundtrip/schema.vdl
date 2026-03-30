@@ -1,0 +1,30 @@
+@rpc
+type Chat {
+  @proc
+  @cache({ scope "room" })
+  sendMessage {
+    input {
+      roomId string
+      message string
+    }
+
+    output {
+      accepted bool
+      seenAnnotations string[]
+    }
+  }
+
+  @stream
+  @topic({ name "messages" })
+  events {
+    input {
+      roomId string
+    }
+
+    output {
+      seq int
+      text string
+      seenAnnotations string[]
+    }
+  }
+}
