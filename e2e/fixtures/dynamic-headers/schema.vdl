@@ -1,0 +1,11 @@
+@rpc
+type Service {
+  @proc
+  get {
+    input {}
+
+    output {
+      val string
+    }
+  }
+}
