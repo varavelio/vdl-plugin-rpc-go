@@ -1,0 +1,8 @@
+@rpc
+type Service {
+  @proc
+  slow {
+    input {}
+    output {}
+  }
+}
