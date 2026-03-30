@@ -1,0 +1,11 @@
+@rpc
+type Clock {
+  @stream
+  ticks {
+    input {}
+
+    output {
+      iso string
+    }
+  }
+}
