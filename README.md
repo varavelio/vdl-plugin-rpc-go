@@ -110,7 +110,6 @@ This plugin follows the VDL RPC annotation model:
 @rpc
 type Messages {
   @proc
-  @cache({ scope "room" })
   send {
     input {
       roomId string
@@ -123,7 +122,6 @@ type Messages {
   }
 
   @stream
-  @reconnectable({ channel "messages" })
   events {
     input {
       roomId string
