@@ -84,23 +84,17 @@ describe("createGeneratorContext", () => {
     expect(operation?.annotations.map((item) => item.name)).toEqual(["cache"]);
   });
 
-  it("reports invalid non-object input and output types", () => {
+  it("ignores non-rpc fields inside rpc services", () => {
     const input = pluginInput({
       ir: schema({
         types: [
           typeDef(
-            "Broken",
+            "Mixed",
             objectType([
-              field(
-                "oops",
-                objectType([
-                  field("input", primitiveType("string")),
-                  field("output", primitiveType("bool")),
-                ]),
-                {
-                  annotations: [annotation("proc")],
-                },
-              ),
+              field("label", primitiveType("string")),
+              field("ping", objectType([]), {
+                annotations: [annotation("proc")],
+              }),
             ]),
             {
               annotations: [annotation("rpc")],
@@ -113,16 +107,15 @@ describe("createGeneratorContext", () => {
     const result = createGeneratorContext({
       input,
       generatorOptions: {
-        packageName: "server",
-        target: "server",
+        packageName: "client",
+        target: "client",
         typesImport: "fixture/internal/types",
       },
     });
 
-    expect(result.context).toBeUndefined();
-    expect(result.errors.map((error) => error.message)).toEqual([
-      'Operation "Broken"."oops" input must be an object type.',
-    ]);
+    expect(result.errors).toEqual([]);
+    expect(result.context?.procedures).toHaveLength(1);
+    expect(result.context?.procedures[0]?.name).toBe("ping");
   });
 
   it("allows operations that omit input and output entirely", () => {
