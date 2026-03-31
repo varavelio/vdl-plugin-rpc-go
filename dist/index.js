@@ -1,25 +1,8 @@
 "use strict";
 var __defProp = Object.defineProperty;
-var __defProps = Object.defineProperties;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
 var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getOwnPropSymbols = Object.getOwnPropertySymbols;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __propIsEnum = Object.prototype.propertyIsEnumerable;
-var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __spreadValues = (a, b) => {
-  for (var prop in b || (b = {}))
-    if (__hasOwnProp.call(b, prop))
-      __defNormalProp(a, prop, b[prop]);
-  if (__getOwnPropSymbols)
-    for (var prop of __getOwnPropSymbols(b)) {
-      if (__propIsEnum.call(b, prop))
-        __defNormalProp(a, prop, b[prop]);
-    }
-  return a;
-};
-var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 var __export = (target, all) => {
   for (var name in all)
@@ -47,6 +30,145 @@ function definePlugin(handler) {
   return handler;
 }
 __name(definePlugin, "definePlugin");
+
+// node_modules/@varavel/vdl-plugin-sdk/dist/_virtual/_@oxc-project_runtime@0.115.0/helpers/typeof.js
+function _typeof(o) {
+  "@babel/helpers - typeof";
+  return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(o2) {
+    return typeof o2;
+  } : function(o2) {
+    return o2 && "function" == typeof Symbol && o2.constructor === Symbol && o2 !== Symbol.prototype ? "symbol" : typeof o2;
+  }, _typeof(o);
+}
+__name(_typeof, "_typeof");
+
+// node_modules/@varavel/vdl-plugin-sdk/dist/_virtual/_@oxc-project_runtime@0.115.0/helpers/toPrimitive.js
+function toPrimitive(t, r) {
+  if ("object" != _typeof(t) || !t) return t;
+  var e = t[Symbol.toPrimitive];
+  if (void 0 !== e) {
+    var i = e.call(t, r || "default");
+    if ("object" != _typeof(i)) return i;
+    throw new TypeError("@@toPrimitive must return a primitive value.");
+  }
+  return ("string" === r ? String : Number)(t);
+}
+__name(toPrimitive, "toPrimitive");
+
+// node_modules/@varavel/vdl-plugin-sdk/dist/_virtual/_@oxc-project_runtime@0.115.0/helpers/toPropertyKey.js
+function toPropertyKey(t) {
+  var i = toPrimitive(t, "string");
+  return "symbol" == _typeof(i) ? i : i + "";
+}
+__name(toPropertyKey, "toPropertyKey");
+
+// node_modules/@varavel/vdl-plugin-sdk/dist/_virtual/_@oxc-project_runtime@0.115.0/helpers/defineProperty.js
+function _defineProperty(e, r, t) {
+  return (r = toPropertyKey(r)) in e ? Object.defineProperty(e, r, {
+    value: t,
+    enumerable: true,
+    configurable: true,
+    writable: true
+  }) : e[r] = t, e;
+}
+__name(_defineProperty, "_defineProperty");
+
+// node_modules/@varavel/vdl-plugin-sdk/dist/_virtual/_@oxc-project_runtime@0.115.0/helpers/objectSpread2.js
+function ownKeys(e, r) {
+  var t = Object.keys(e);
+  if (Object.getOwnPropertySymbols) {
+    var o = Object.getOwnPropertySymbols(e);
+    r && (o = o.filter(function(r2) {
+      return Object.getOwnPropertyDescriptor(e, r2).enumerable;
+    })), t.push.apply(t, o);
+  }
+  return t;
+}
+__name(ownKeys, "ownKeys");
+function _objectSpread2(e) {
+  for (var r = 1; r < arguments.length; r++) {
+    var t = null != arguments[r] ? arguments[r] : {};
+    r % 2 ? ownKeys(Object(t), true).forEach(function(r2) {
+      _defineProperty(e, r2, t[r2]);
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function(r2) {
+      Object.defineProperty(e, r2, Object.getOwnPropertyDescriptor(t, r2));
+    });
+  }
+  return e;
+}
+__name(_objectSpread2, "_objectSpread2");
+
+// node_modules/@varavel/vdl-plugin-sdk/dist/utils/rpc/validate-ir-for-rpc.js
+var RPC_ANNOTATION_NAME = "rpc";
+var PROC_ANNOTATION_NAME = "proc";
+var STREAM_ANNOTATION_NAME = "stream";
+function validateIrForRpc(ir) {
+  const rpcTypes = ir.types.filter((typeDef) => {
+    return hasAnnotation(typeDef.annotations, RPC_ANNOTATION_NAME);
+  });
+  if (rpcTypes.length === 0) return;
+  const errors = [];
+  for (const rpcType of rpcTypes) validateRpcType(rpcType, errors);
+  return errors.length === 0 ? void 0 : errors;
+}
+__name(validateIrForRpc, "validateIrForRpc");
+function validateRpcType(typeDef, errors) {
+  var _typeDef$typeRef$obje;
+  if (typeDef.typeRef.kind !== "object") {
+    errors.push({
+      message: `Type ${JSON.stringify(typeDef.name)} is annotated with @rpc and must be an object type.`,
+      position: typeDef.position
+    });
+    return;
+  }
+  const fields = (_typeDef$typeRef$obje = typeDef.typeRef.objectFields) !== null && _typeDef$typeRef$obje !== void 0 ? _typeDef$typeRef$obje : [];
+  for (const field of fields) validateRpcOperationField(typeDef, field, errors);
+}
+__name(validateRpcType, "validateRpcType");
+function validateRpcOperationField(rpcType, field, errors) {
+  const hasProc = hasAnnotation(field.annotations, PROC_ANNOTATION_NAME);
+  const hasStream = hasAnnotation(field.annotations, STREAM_ANNOTATION_NAME);
+  if (!hasProc && !hasStream) return;
+  if (hasProc && hasStream) {
+    errors.push({
+      message: `Field ${JSON.stringify(`${rpcType.name}.${field.name}`)} cannot be annotated with both @proc and @stream.`,
+      position: field.position
+    });
+    return;
+  }
+  const operationAnnotation = hasProc ? PROC_ANNOTATION_NAME : STREAM_ANNOTATION_NAME;
+  if (field.typeRef.kind !== "object") {
+    errors.push({
+      message: `Field ${JSON.stringify(`${rpcType.name}.${field.name}`)} is annotated with @${operationAnnotation} and must be an object type.`,
+      position: field.position
+    });
+    return;
+  }
+  const inputField = findFieldByName(field.typeRef.objectFields, "input");
+  const outputField = findFieldByName(field.typeRef.objectFields, "output");
+  if (inputField && inputField.typeRef.kind !== "object") errors.push({
+    message: `Field "input" in operation ${JSON.stringify(`${rpcType.name}.${field.name}`)} must be an object type when present.`,
+    position: withFallbackFile(inputField.position, field.position)
+  });
+  if (outputField && outputField.typeRef.kind !== "object") errors.push({
+    message: `Field "output" in operation ${JSON.stringify(`${rpcType.name}.${field.name}`)} must be an object type when present.`,
+    position: withFallbackFile(outputField.position, field.position)
+  });
+}
+__name(validateRpcOperationField, "validateRpcOperationField");
+function hasAnnotation(annotations, name) {
+  return annotations.some((annotation) => annotation.name === name);
+}
+__name(hasAnnotation, "hasAnnotation");
+function findFieldByName(fields, name) {
+  return fields === null || fields === void 0 ? void 0 : fields.find((field) => field.name === name);
+}
+__name(findFieldByName, "findFieldByName");
+function withFallbackFile(primary, fallback) {
+  if (primary.file.length > 0 || fallback.file.length === 0) return primary;
+  return _objectSpread2(_objectSpread2({}, primary), {}, { file: fallback.file });
+}
+__name(withFallbackFile, "withFallbackFile");
 
 // src/shared/errors.ts
 var _GenerationError = class _GenerationError extends Error {
@@ -217,7 +339,7 @@ function pascalCase(str) {
 __name(pascalCase, "pascalCase");
 
 // node_modules/@varavel/vdl-plugin-sdk/dist/node_modules/dedent/dist/dedent.js
-function ownKeys(object, enumerableOnly) {
+function ownKeys2(object, enumerableOnly) {
   var keys = Object.keys(object);
   if (Object.getOwnPropertySymbols) {
     var symbols = Object.getOwnPropertySymbols(object);
@@ -227,20 +349,20 @@ function ownKeys(object, enumerableOnly) {
   }
   return keys;
 }
-__name(ownKeys, "ownKeys");
+__name(ownKeys2, "ownKeys");
 function _objectSpread(target) {
   for (var i = 1; i < arguments.length; i++) {
     var source = null != arguments[i] ? arguments[i] : {};
-    i % 2 ? ownKeys(Object(source), true).forEach(function(key) {
-      _defineProperty(target, key, source[key]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function(key) {
+    i % 2 ? ownKeys2(Object(source), true).forEach(function(key) {
+      _defineProperty2(target, key, source[key]);
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys2(Object(source)).forEach(function(key) {
       Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
     });
   }
   return target;
 }
 __name(_objectSpread, "_objectSpread");
-function _defineProperty(obj, key, value) {
+function _defineProperty2(obj, key, value) {
   key = _toPropertyKey(key);
   if (key in obj) Object.defineProperty(obj, key, {
     value,
@@ -251,7 +373,7 @@ function _defineProperty(obj, key, value) {
   else obj[key] = value;
   return obj;
 }
-__name(_defineProperty, "_defineProperty");
+__name(_defineProperty2, "_defineProperty");
 function _toPropertyKey(arg) {
   var key = _toPrimitive(arg, "string");
   return typeof key === "symbol" ? key : String(key);
@@ -3953,18 +4075,11 @@ __name(escapeGoIdentifier, "escapeGoIdentifier");
 // src/stages/model/build-context.ts
 function createGeneratorContext(options) {
   const services = [];
-  const errors = [];
   for (const typeDef of options.input.ir.types) {
     if (!getAnnotation(typeDef.annotations, "rpc")) {
       continue;
     }
-    const service = buildServiceDescriptor(typeDef, errors);
-    if (service) {
-      services.push(service);
-    }
-  }
-  if (errors.length > 0) {
-    return { errors };
+    services.push(buildServiceDescriptor(typeDef));
   }
   const procedures = [];
   const streams = [];
@@ -3985,18 +4100,11 @@ function createGeneratorContext(options) {
   };
 }
 __name(createGeneratorContext, "createGeneratorContext");
-function buildServiceDescriptor(typeDef, errors) {
+function buildServiceDescriptor(typeDef) {
   var _a2;
-  if (typeDef.typeRef.kind !== "object") {
-    errors.push({
-      message: `@rpc type ${JSON.stringify(typeDef.name)} must be an object type.`,
-      position: typeDef.position
-    });
-    return void 0;
-  }
   const operations = [];
   for (const field of (_a2 = typeDef.typeRef.objectFields) != null ? _a2 : []) {
-    const operation = buildOperationDescriptor(typeDef, field, errors);
+    const operation = buildOperationDescriptor(typeDef, field);
     if (operation) {
       operations.push(operation);
     }
@@ -4014,42 +4122,17 @@ function buildServiceDescriptor(typeDef, errors) {
   };
 }
 __name(buildServiceDescriptor, "buildServiceDescriptor");
-function buildOperationDescriptor(serviceType, field, errors) {
+function buildOperationDescriptor(serviceType, field) {
   const isProc = Boolean(getAnnotation(field.annotations, "proc"));
   const isStream = Boolean(getAnnotation(field.annotations, "stream"));
   if (!isProc && !isStream) {
     return void 0;
   }
   if (isProc && isStream) {
-    errors.push({
-      message: `Operation ${JSON.stringify(serviceType.name)}.${JSON.stringify(field.name)} cannot be annotated with both @proc and @stream.`,
-      position: field.position
-    });
-    return void 0;
-  }
-  if (field.typeRef.kind !== "object") {
-    errors.push({
-      message: `@${isProc ? "proc" : "stream"} field ${JSON.stringify(serviceType.name)}.${JSON.stringify(field.name)} must be an object type.`,
-      position: field.position
-    });
     return void 0;
   }
   const inputField = findOperationField(field, "input");
   const outputField = findOperationField(field, "output");
-  if (inputField && inputField.typeRef.kind !== "object") {
-    errors.push({
-      message: `Operation ${JSON.stringify(serviceType.name)}.${JSON.stringify(field.name)} input must be an object type.`,
-      position: fallbackPosition(inputField.position, field.position)
-    });
-    return void 0;
-  }
-  if (outputField && outputField.typeRef.kind !== "object") {
-    errors.push({
-      message: `Operation ${JSON.stringify(serviceType.name)}.${JSON.stringify(field.name)} output must be an object type.`,
-      position: fallbackPosition(outputField.position, field.position)
-    });
-    return void 0;
-  }
   const rpcGoName = toGoTypeName(serviceType.name);
   const goName = toGoFieldName(field.name);
   const operationTypeName = toInlineTypeName(rpcGoName, field.name);
@@ -4096,18 +4179,6 @@ function filterOperationalAnnotations(annotations, kind) {
   return annotations.filter((annotation) => annotation.name !== kind);
 }
 __name(filterOperationalAnnotations, "filterOperationalAnnotations");
-function fallbackPosition(primary, fallback) {
-  if (!primary) {
-    return fallback;
-  }
-  if (!primary.file) {
-    return __spreadProps(__spreadValues({}, primary), {
-      file: fallback.file
-    });
-  }
-  return primary;
-}
-__name(fallbackPosition, "fallbackPosition");
 
 // node_modules/@varavel/vdl-plugin-sdk/dist/utils/options/get-option-string.js
 function getOptionString(options, key, defaultValue) {
@@ -4167,6 +4238,10 @@ function generate(input) {
     const optionsResult = resolveGeneratorOptions(input);
     if (optionsResult.errors.length > 0 || !optionsResult.options) {
       return { errors: optionsResult.errors };
+    }
+    const rpcValidationErrors = validateIrForRpc(input.ir);
+    if (rpcValidationErrors) {
+      return { errors: rpcValidationErrors };
     }
     const contextResult = createGeneratorContext({
       input,
