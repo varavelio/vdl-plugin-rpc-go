@@ -136,4 +136,43 @@ describe("generate", () => {
       "Execute(ctx context.Context, input Void) (Void, error)",
     );
   });
+
+  it("returns SDK RPC validation errors before modeling", () => {
+    const output = generate(
+      pluginInput({
+        ir: schema({
+          types: [
+            typeDef(
+              "Broken",
+              objectType([
+                field(
+                  "oops",
+                  objectType([field("input", primitiveType("string"))]),
+                  {
+                    annotations: [annotation("proc")],
+                  },
+                ),
+              ]),
+              {
+                annotations: [annotation("rpc")],
+              },
+            ),
+          ],
+        }),
+        options: {
+          package: "serverpkg",
+          target: "server",
+          typesImport: "fixture/internal/types",
+        },
+      }),
+    );
+
+    expect(output.files).toBeUndefined();
+    expect(output.errors).toEqual([
+      expect.objectContaining({
+        message:
+          'Field "input" in operation "Broken.oops" must be an object type when present.',
+      }),
+    ]);
+  });
 });
